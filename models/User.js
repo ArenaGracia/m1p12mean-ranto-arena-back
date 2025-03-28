@@ -11,7 +11,7 @@ const UserSchema = new mongoose.Schema({
     password: { type: String, required: true },
     contact: { type: String, required: true },
     profile_id: { type: mongoose.Schema.Types.ObjectId, ref: "Profile", required: true }
-}, {collection: "user"});
+}, {collection: "user"}, { timestamps: true });
 
 module.exports = {
     Profile: mongoose.model("Profile", ProfileSchema),

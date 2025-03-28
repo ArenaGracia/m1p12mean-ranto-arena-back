@@ -2,12 +2,22 @@ const express = require('express');
 const router = express.Router();
 
 const { QuoteState, Quote } = require('../models/Quote');
-const { addDiscount, getQuotesByState } = require('../services/quoteService');
+const { addDiscount, getQuotesByState, getQuoteById, updateQuoteState } = require('../services/quoteService');
 
 // prendre toutes les devis
 router.get('/', async (req, res) => {
     try {
        const quotes = await Quote.find();
+       res.status(201).json(quotes);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+});
+
+// prendre par id
+router.get('/:id', async (req, res) => {
+    try {
+       const quotes = await getQuoteById(req.params.id);
        res.status(201).json(quotes);
     } catch (error) {
         res.status(500).json({message: error.message});

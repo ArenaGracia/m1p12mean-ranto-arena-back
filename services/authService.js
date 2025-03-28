@@ -18,7 +18,7 @@ const AuthService = {
         console.log("Authentification d'un utilisateur :" + user.profile_id.name);
 
         const token = jwt.sign({ id: user.id, email: user.email, name: user.name, firstName: user.firstName, profile: user.profile_id.name },
-            SECRET_KEY, {expiresIn: '1h',
+            SECRET_KEY, {expiresIn: '3h',
         });
         return token;
     },
