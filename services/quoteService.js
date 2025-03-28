@@ -60,12 +60,13 @@ async function updateQuoteState(quoteId, value) {
 
 async function addDiscount(quoteId, discount) {
     try {
-        const updatedQuote = await Quote.findByIdAndUpdate(
-            req.params.id,
-            { discount },
-            { new: true, runValidators: true }
-        );
-        return updatedQuote;
+        const quote = await Quote.findById(quoteId);
+        if (!quote) {
+          return res.status(404).json({ message: 'Quote not found' });
+        }
+        console.log(quote);
+        quote.discount = discount;
+        return await quote.save();
     } catch (error) {
         throw new Error(`Error during updating the discount : ${error.message}`);
     }

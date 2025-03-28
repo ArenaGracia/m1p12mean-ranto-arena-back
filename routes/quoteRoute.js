@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const { QuoteState, Quote } = require('../models/Quote');
-const { addDiscount, getQuotesByState, getQuoteById, updateQuoteState } = require('../services/quoteService');
+const { getQuotesByState, getQuoteById, updateQuoteState, addDiscount } = require('../services/quoteService');
 
 // prendre toutes les devis
 router.get('/', async (req, res) => {
@@ -57,14 +57,12 @@ router.put('/decline/:id', async (req, res) => {
 // ajouter une remise
 router.put('/discount/:id', async (req, res) => {
     try {
-        const { discount } = req.body;
-        if (!discount) {
-            return res.status(400).json({ message: "La valeur de la remise est requise." });
-        }
-        const quotes = await addDiscount(req.params.id, discount);
-        res.status(201).json(quotes);
+        console.log('discount :' + req.body.discount + ' id' + req.params.id);
+        const UpdatedQuote = await addDiscount(req.params.id, req.body.discount);
+        res.status(201).json(UpdatedQuote);
     } catch (error) {
-        res.status(500).json({message: error.message});
+        console.log(error.message);
+        res.status(500).json({message: 'Error during updating the discount :' + error.message});
     }
 });
 
