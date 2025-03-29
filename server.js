@@ -23,9 +23,10 @@ const corsOptions = {
 };
 
 // Middleware 
-app.use(cors()); 
+app.use(cors(corsOptions)); 
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(authMiddleware);
 
 // Connexion à MongoDB 
 mongoose.connect(process.env.MONGO_URI, { 
@@ -39,5 +40,7 @@ app.use('/auth', require('./routes/authRoutes'));
 app.use('/api/quotes', require('./routes/quoteRoute'));
 app.use('/api/prestations', require('./routes/prestationRoute'));
 app.use('/api/categories', require('./routes/categoryRoute'));
+app.use('/api/email', require('./routes/emailRoute'));
 
-module.exports = app;
+app.listen(PORT, () => console.log(`Serveur démarré sur le port 
+${PORT}`)); 

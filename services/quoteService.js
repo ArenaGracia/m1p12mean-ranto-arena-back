@@ -7,16 +7,10 @@ async function getQuotesByState(stateValue) {
         const state = await getStateByValue(stateValue);
         return await Quote.find({ quote_state_id: state._id }).populate({
                 path: "appointment_id",
-                populate: {
-                    path: "user_id",
-                    select: "name first_name"
-                },
+                populate: { path: "user_id", select: "name first_name" },
                 select: "user_id time_start" 
             })
-            .populate({
-                path: "quote_state_id",
-                select: "value"
-            })
+            .populate({ path: "quote_state_id", select: "value" })
             .select("total_price discount appointment_id quote_state_id");
     } catch (error) {
         throw new Error(`Error during getting the quote : ${error.message}`);
@@ -27,16 +21,10 @@ async function getQuoteById(quoteId) {
     try {
         return await Quote.findOne({ _id: quoteId }).populate({
             path: "appointment_id",
-            populate: {
-                path: "user_id",
-                select: "name first_name"
-            },
+            populate: { path: "user_id", select: "name first_name" },
             select: "user_id time_start time_end" 
         })
-        .populate({
-            path: "quote_state_id",
-            select: "value"
-        })
+        .populate({ path: "quote_state_id", select: "value" })
         .select("total_price discount appointment_id quote_state_id");;
     } catch (error) {
         throw error;
@@ -71,6 +59,8 @@ async function addDiscount(quoteId, discount) {
         throw new Error(`Error during updating the discount : ${error.message}`);
     }
 }
+
+
 
 module.exports = {
     getQuotesByState,

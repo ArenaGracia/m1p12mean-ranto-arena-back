@@ -66,13 +66,4 @@ router.put('/discount/:id', async (req, res) => {
     }
 });
 
-router.get('/states', async (req, res) => {
-    try {
-       const quotes = await QuoteState.find();
-       res.status(201).json(quotes);
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
-});
-
 module.exports = router;
