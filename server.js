@@ -41,3 +41,5 @@ app.use('/api/quotes', require('./routes/quoteRoute'));
 app.use('/api/prestations', require('./routes/prestationRoute'));
 app.use('/api/categories', require('./routes/categoryRoute'));
 app.use('/api/email', require('./routes/emailRoute'));
+
+module.exports = app;
