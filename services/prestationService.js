@@ -1,14 +1,16 @@
 
-const { Category, Prestation } = require("../models/Prestation");
+const { default: mongoose } = require("mongoose");
+const { Prestation } = require("../models/Prestation");
+const { ObjectId } = require("mongoose").Types;
 
 async function getPrestationWithImage() {
-    const prestations = await Prestation.find().populate("category_id");
+    const prestations = await mongoose.connection.db.collection("v_prestation_libcomplet").find().toArray();
     const prestationsWithImages = prestations.map(p => {
         let imageBase64 = null;
-        if (p.image && p.image instanceof Buffer) {
+        if (p.image) {
             imageBase64 = `data:image/jpeg;base64,${p.image.toString('base64')}`;
         }
-        return { ...p.toObject(), image: imageBase64,
+        return { ...p, image: imageBase64,
         };
     });
     return prestationsWithImages;
@@ -27,13 +29,13 @@ async function getPrestationById(id) {
 }
 
 async function getPrestationByCategory(categoryId) {
-    const prestations = await Prestation.find({ category_id: categoryId });
+    const prestations = await mongoose.connection.db.collection("v_prestation_libcomplet").find({ "category._id" :  new ObjectId(categoryId) }).toArray();
     const prestationsWithImages = prestations.map(p => {
         let imageBase64 = null;
-        if (p.image && p.image instanceof Buffer) {
+        if (p.image) {
             imageBase64 = `data:image/jpeg;base64,${p.image.toString('base64')}`;
         }
-        return { ...p.toObject(), image: imageBase64,
+        return { ...p, image: imageBase64,
         };
     });
     return prestationsWithImages;
