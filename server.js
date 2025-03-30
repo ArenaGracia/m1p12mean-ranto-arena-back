@@ -11,7 +11,6 @@ const whitelist = ['http://localhost:4200']; // sites autorisés
 
 const corsOptions = {
   origin: function (origin, callback) {
-    console.log(origin);
     if (!origin || whitelist.includes(origin)) {
       callback(null, true);
     } else {
