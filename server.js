@@ -23,9 +23,10 @@ const corsOptions = {
 };
 
 // Middleware 
-app.use(cors()); 
+app.use(cors(corsOptions)); 
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(authMiddleware);
 
 // Connexion à MongoDB 
 mongoose.connect(process.env.MONGO_URI, { 
@@ -36,8 +37,9 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // Routes
 app.use('/auth', require('./routes/authRoutes'));
-app.use('/api/quote', require('./routes/quoteRoute'));
+app.use('/api/quotes', require('./routes/quoteRoute'));
 app.use('/api/prestations', require('./routes/prestationRoute'));
 app.use('/api/categories', require('./routes/categoryRoute'));
+app.use('/api/email', require('./routes/emailRoute'));
 
 module.exports = app;

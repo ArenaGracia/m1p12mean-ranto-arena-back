@@ -1,0 +1,31 @@
+<div style="text-align: center; font-family: Arial, sans-serif; padding: 15px">
+    <h2>Confirmation d'une nouvelle date !</h2>
+
+    <p>Bonjour, Nous vous excusons que nous avons reporté la date de rendez-vous à <strong>${newDate}</strong> au lieu de <strong>${oldDate}</strong>.</p>
+    <p>Cela a été faite pour une meilleur organisation de notre côté.</p>
+    <p>Merci de votre compréhension</p>
+    
+
+    <a href="${validateLink}" style="
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #e94016;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        margin-top: 20px;
+        font-weight: bold;
+        ">Confirmer cette nouvelle date</a>
+
+    <a href="${cancelLink}" style="
+        display: inline-block;
+        padding: 12px 24px;
+        background-color: #bdbdbd;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        margin-top: 20px;
+        font-weight: bold;
+        ">Annuler</a>
+
+</div>
