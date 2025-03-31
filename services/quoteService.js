@@ -7,10 +7,23 @@ const { getStateByValue } = require('./quoteStateService');
 async function getQuotesByState(stateValue) {
     try {
         const state = await getStateByValue(stateValue);
-        return await mongoose.connection.db.collection("v_quote_libcomplet").find({ quote_state_id: state._id }).toArray();
+        return await mongoose.connection.db.collection("v_quote_libcomplet").find({ "quote_state._id": state._id }).toArray();
     } catch (error) {
         throw new Error(`Error during getting the quote : ${error.message}`);
     }
+}
+
+async function getQuoteById(quoteId) {
+    const quote = await mongoose.connection.db.collection("v_quote_libcomplet")
+    .aggregate([
+        { $match: { _id: new ObjectId(quoteId) } },
+        { $lookup: {
+            from: "v_quote_details_libcomplet", localField: "_id", foreignField: "quote_id", as: "quote_details"
+        }},
+        { $project: { "quote_details.quote_id": 0 } }
+    ])
+    .toArray();
+    return quote[0];
 }
 
 async function updateQuoteState(quoteId, value) {
@@ -55,6 +68,7 @@ module.exports = {
     getQuotesByState,
     updateQuoteState,
     addDiscount,
-    validateNewDate
+    validateNewDate,
+    getQuoteById
 }
 

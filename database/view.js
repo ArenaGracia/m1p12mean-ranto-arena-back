@@ -20,7 +20,7 @@ db.createView(
   )
   
 
-  db.createView(
+db.createView(
     "v_category_libcomplet",  
     "category",               
     [
@@ -38,9 +38,55 @@ db.createView(
         }
       }
     ]
-  );
+);
   
   
+// Appointment View jointure user & car & state
+db.createView (
+    "v_appointment_libcomplet",   
+    "appointment",            
+    [
+        {
+            $lookup: {
+                from: "user",           
+                localField: "user_id",   
+                foreignField: "_id",     
+                as: "user"
+            }
+        },
+        { $unwind: "$user" },   
+        {
+            $lookup: {
+                from: "car",           
+                localField: "car_id",   
+                foreignField: "_id",     
+                as: "car"
+            }
+        },
+        { $unwind: "$car" },   
+        {
+            $lookup: {
+                from: "appointment_state",           
+                localField: "state_appointment_id",   
+                foreignField: "_id",     
+                as: "appointment_state"
+            }
+        },
+        { $unwind: "$appointment_state" },   
+        {
+            $project: {
+                "car_id": 0,
+                "car.user_id": 0,
+                "user_id": 0,         
+                "user.password": 0,
+                "user.contact": 0,
+                "user.profile_id": 0,
+                "state_appointment_id": 0,
+                "appointment_state.state_id": 0,
+            }
+        }
+    ]
+);
 
 
 // Quote views
@@ -52,57 +98,104 @@ db.createView(
     [ 
         {
             $lookup: {
-                from: "appointment",           
+                from: "quote_state",           
+                localField: "quote_state_id",   
+                foreignField: "_id",     
+                as: "quote_state"
+            }
+        },
+        { $unwind: "$quote_state" },  
+        {
+            $lookup: {
+                from: "v_appointment_libcomplet",           
                 localField: "appointment_id",   
                 foreignField: "_id",     
                 as: "appointment"
             }
         },
-        { $unwind: "$appointment" },   
-        {
-            $lookup: {
-                from: "user",           
-                localField: "appointment.user_id",   
-                foreignField: "_id",     
-                as: "appointment.user"
-            }
-        },
-        { $unwind: "$appointment.user" },   
+        { $unwind: "$appointment" },  
         {
             $project: {
-                "appointment.user_id": 0,  
-                "appointment_id": 0,     
-                "appointment.user.password": 0, 
-                "appointment.user.contact": 0,
-                "appointment.user.profile_id": 0
+                "appointment.appointment_state": 0,
+                "quote_state.state_id": 0,
+                "quote_state_id": 0,
+                "appointment_id": 0
+            }
+        } 
+    ]
+)
+
+
+db.createView ( "v_prestation_brand_libcomplet", "prestation_brand",
+    [
+        {
+            $lookup: {
+                from: "v_prestation_libcomplet",
+                localField: "prestation_id",
+                foreignField: "_id",
+                as: "prestation"
+            }
+        },
+        { $unwind: "$prestation" }, 
+        {
+            $lookup: {
+                from: "brand",
+                localField: "brand_id",
+                foreignField: "_id",
+                as: "brand"
+            }
+        },
+        { $unwind: "$brand" }, 
+        {
+            $project: {
+                "prestation.image": 0,
+                "brand.image": 0,
+                "brand_id": 0,
+                "prestation_id" : 0,
             }
         }
     ]
 )
 
 
-
-db.createView (
-    "v_quote_details",
-    "quote_details",
+db.createView(
+    "v_quote_details_libcomplet",  
+    "quote_details",               
     [
-        {
-            $lookup: {
-                from: "prestation_brand",
-                localField: "prestation_brand_id",
-                foreignField: "_id",
-                as: "prestationBrand"
-            },
-        },
-        { $unwind: "$prestationBrand" },  
-        {
-            $lookup: {
-            from: "prestation",
-            localField: "prestationBrand.prestation_id",
-            foreignField: "_id",
-            as: "prestation"
-            }
-        },
-        { $unwind: "$prestation" }, 
+      {
+        $lookup: {              
+          from: "v_prestation_brand_libcomplet",     
+          localField: "prestation_brand_id",   
+          foreignField: "_id",
+          as: "prestation_brand"         
+        }
+      },
+      { $unwind: "$prestation_brand" },  
+      {
+        $project: {              
+          prestation_brand_id: 0, 
+          "prestation_brand.prestation.description": 0       
+        }
+      }
     ]
-)
+);
+
+
+// Devis avec liste details devis
+db.v_quote_libcomplet.aggregate([
+    {
+        $lookup: {
+            from: "v_quote_details_libcomplet",
+            localField: "_id",
+            foreignField: "quote_id",
+            as: "quote_details"
+        },
+    },
+    {
+        $project: {              
+            "quote_details.quote_id": 0,
+        }
+    }
+]);
+
+
