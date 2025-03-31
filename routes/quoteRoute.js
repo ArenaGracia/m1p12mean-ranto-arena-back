@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-
+const mongoose = require('mongoose');
+const { ObjectId } = mongoose.Types;
 const { QuoteState, Quote } = require('../models/Quote');
-const { getQuotesByState, getQuoteById, updateQuoteState, addDiscount } = require('../services/quoteService');
+const { getQuotesByState, updateQuoteState, addDiscount, validateNewDate } = require('../services/quoteService');
 
 // prendre toutes les devis
 router.get('/', async (req, res) => {
@@ -17,7 +18,7 @@ router.get('/', async (req, res) => {
 // prendre par id
 router.get('/:id', async (req, res) => {
     try {
-       const quotes = await getQuoteById(req.params.id);
+       const quotes = await mongoose.connection.db.collection("v_quote_libcomplet").findOne({ _id: new ObjectId(req.params.id) });
        res.status(201).json(quotes);
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -37,8 +38,8 @@ router.get('/state/:state', async (req, res) => {
 // valider un devis
 router.put('/validate/:id', async (req, res) => {
     try {
-        const quotes = await updateQuoteState(req.params.id, 3);
-        res.status(201).json(quotes);
+        const quote = await updateQuoteState(req.params.id, 3);
+        res.status(201).json(quote);
     } catch (error) {
         res.status(500).json({message: error.message});
     }

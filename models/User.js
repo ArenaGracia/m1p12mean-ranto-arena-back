@@ -15,5 +15,5 @@ const UserSchema = new mongoose.Schema({
 
 module.exports = {
     Profile: mongoose.model("Profile", ProfileSchema),
-    User: mongoose.model('User', UserSchema),
+    User: mongoose.model('User', UserSchema)
 };

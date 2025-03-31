@@ -8,7 +8,7 @@ const AppointmentStateSchema = new mongoose.Schema({
 }, { collection: 'appointment_state' });
   
 const AppointmentSchema = new mongoose.Schema({
-    user_id: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "user", required: true },
     car_id: { type: mongoose.Schema.Types.ObjectId, ref: "Car", required: true },
     time_start: { type: Date, required: true  },
     time_end: { type: Date, required: true },
@@ -20,5 +20,5 @@ const AppointmentSchema = new mongoose.Schema({
 
 module.exports = {
     AppointmentState: mongoose.model("AppointmentState", AppointmentStateSchema),
-    Appointment: mongoose.model('Appointment', AppointmentSchema),
+    Appointment: mongoose.model('Appointment', AppointmentSchema)
 };
