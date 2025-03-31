@@ -1,9 +1,13 @@
 const AuthService = require('../services/authService');
 
-const EXCLUDED_PATHS = ['/auth/login'];
+const EXCLUDED_PATHS = [
+    '/auth/login',
+    '/api/prestations',
+    '/api/categories',
+];
 
 const authMiddleware = (req, res, next) => {
-    if (EXCLUDED_PATHS.includes(req.path)) return next();
+    if (EXCLUDED_PATHS.includes(req.path) || req.path.startsWith('/api/categories')) return next();
 
     const authHeader = req.headers['authorization'];
     if (!authHeader) return res.status(403).json({ message: 'No token provided' });

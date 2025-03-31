@@ -19,3 +19,26 @@ db.createView(
     ]
   )
   
+
+  db.createView(
+    "v_category_libcomplet",  
+    "category",               
+    [
+      {
+        $lookup: {              
+          from: "prestation",     
+          localField: "_id",   
+          foreignField: "category_id",
+          as: "prestations"         
+        }
+      },
+      {
+        $project: {              
+          typeId: 0,        
+        }
+      }
+    ]
+  );
+  
+  
+  
