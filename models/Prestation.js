@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const CategorySchema = new mongoose.Schema({
     name: { type: String, required: true }, 
+    prestations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'prestation' }]
 }, { collection: 'category' });
 
 const PrestationSchema = new mongoose.Schema({
