@@ -11,8 +11,7 @@ const AuthService = {
         const user = await User.findOne({email: email}).populate('profile_id');
         if (!user) throw new Error('User not found');
 
-        // const valid = await bcrypt.compare(password, user.password);
-        const valid = (password === user.password);
+        const valid = await bcrypt.compare(password, user.password);
         if (!valid) throw new Error('Invalid password');
 
         let token = await getTokenValidUser(email, password);
