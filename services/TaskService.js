@@ -4,10 +4,37 @@ const { Appointment } = require('../models/Appointment');
 const Task = require('../models/Task');
 const { Quote } = require('../models/Quote');
 
-async function getTasks(page = 0, size = 10) {
+async function getTasks(page = 0, size = 10, state, userId, startDate, endDate, categoryId) {
+    const skip = page * size;
+    const filter = {};
+
+    if (state)
+        filter["state"] = state;
+
+    if (userId)
+        filter["user._id"] = new mongoose.Types.ObjectId(userId);
+
+    if (startDate || endDate) {
+        filter["date_start"] = {}; 
+        if (startDate) filter["date_start"].$gte = new Date(startDate);
+        if (endDate) filter["date_start"].$lte = new Date(endDate);
+    }
+
+    if (categoryId)
+        filter["prestation_brand.prestation.category._id"] = new mongoose.Types.ObjectId(categoryId);
+
+    const tasks = await mongoose.connection.db.collection("v_task_libcomplet")
+        .find(filter)
+        .skip(skip) // debut
+        .limit(Number(size)) // fin
+        .toArray();
+    return tasks;
+}
+
+async function getNonAffectedTasks(page = 0, size = 10) {
     const skip = page * size;
     const tasks = await mongoose.connection.db.collection("v_task_libcomplet")
-        .find()
+        .find({user: null})
         .skip(skip) // debut
         .limit(Number(size)) // fin
         .toArray();
@@ -32,5 +59,6 @@ async function createTasks(quoteId) {
 
 module.exports = {
     createTasks,
-    getTasks
+    getTasks,
+    getNonAffectedTasks
 }

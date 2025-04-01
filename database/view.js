@@ -40,6 +40,24 @@ db.createView(
     ]
 );
   
+db.createView ("v_user", "user", [
+    {
+        $lookup: {
+            from: "profile",           
+            localField: "profile_id",   
+            foreignField: "_id",     
+            as: "profile"
+        }
+    },
+    { $unwind: "$profile" },   
+    {
+        $project: {
+            "profile_id": 0,
+            "profile.user_id": 0,            
+            "user.password": 0,      
+        }
+    }
+]);
   
 // Appointment View jointure user & car & state
 db.createView (
@@ -199,31 +217,38 @@ db.v_quote_libcomplet.aggregate([
 ]);
 
 
-db.createView("v_task_libcomplet", "task",
-[
+db.createView("v_task_libcomplet", "task", [
     {
         $lookup: {
-            from: "v_prestation_brand_libcomplet", 
+            from: "v_prestation_brand_libcomplet",
             localField: "prestation_brand_id",
             foreignField: "_id",
             as: "prestation_brand"
         }
     },
-    { $unwind: "$prestation_brand" }, 
-    
+    { 
+        $unwind: { 
+            path: "$prestation_brand", 
+            preserveNullAndEmptyArrays: true 
+        } 
+    },
     {
         $lookup: {
-            from: "user", 
-            localField: "user_id", 
+            from: "user",
+            localField: "user_id",
             foreignField: "_id",
             as: "user"
         }
     },
-    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+    {
+        $addFields: {
+            user: { $arrayElemAt: ["$user", 0] } // Sélectionne uniquement le premier élément du tableau
+        }
+    },
     {
         $project: {
-            "user.password": 0,  
-            "user.contact": 0, 
+            "user.password": 0,
+            "user.contact": 0,
             "user.profile_id": 0,
             "task_state.state_id": 0,
             "state_task_id": 0,
@@ -231,6 +256,5 @@ db.createView("v_task_libcomplet", "task",
             "__v": 0
         }
     }
-]
-);
+]);
 
