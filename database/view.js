@@ -31,13 +31,24 @@ db.createView(
           foreignField: "category_id",
           as: "prestations"         
         }
-      },
-      {
-        $project: {              
-          typeId: 0,        
-        }
       }
     ]
+);
+
+db.createView(
+  "v_token_user",  
+  "token_user",               
+  [
+    {
+      $lookup: {              
+        from: "user",     
+        localField: "user_id",   
+        foreignField: "_id",
+        as: "user"         
+      }
+    },
+    { $unwind: "$user" },   
+  ]
 );
   
   
@@ -233,4 +244,6 @@ db.createView("v_task_libcomplet", "task",
     }
 ]
 );
+
+
 
