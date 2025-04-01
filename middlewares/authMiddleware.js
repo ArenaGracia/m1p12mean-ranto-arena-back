@@ -16,7 +16,7 @@ const authMiddleware = (req, res, next) => {
     const token = authHeader.split(' ')[1];
     try {
         const user = AuthService.verifyToken(token);
-        req.user = user;
+        req.user = user;                
         next();
     } catch (err) {
         console.log("Token invalide détécté");
