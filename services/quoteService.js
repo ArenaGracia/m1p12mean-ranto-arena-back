@@ -31,6 +31,20 @@ async function getQuoteById(quoteId) {
     }
 }
 
+// async function getQuoteByUser(){
+//     try {
+//         return await Quote.findOne({ _id: quoteId }).populate({
+//             path: "appointment_id",
+//             populate: { path: "user_id", select: "name first_name" },
+//             select: "user_id time_start time_end" 
+//         })
+//         .populate({ path: "quote_state_id", select: "value" })
+//         .select("total_price discount appointment_id quote_state_id");;
+//     } catch (error) {
+//         throw error;
+//     }
+// }
+
 async function updateQuoteState(quoteId, value) {
     try {
         const state = await getStateByValue(value);
