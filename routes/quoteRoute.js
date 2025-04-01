@@ -2,13 +2,24 @@ const express = require('express');
 const router = express.Router();
 
 const { QuoteState, Quote } = require('../models/Quote');
-const { getQuotesByState, getQuoteById, updateQuoteState, addDiscount } = require('../services/quoteService');
+const { getQuotesByState, updateQuoteState, addDiscount, getQuoteById, getQuotesByUser } = require('../services/quoteService');
 
 // prendre toutes les devis
 router.get('/', async (req, res) => {
     try {
-       const quotes = await Quote.find();
+       const quotes = await mongoose.connection.db.collection("v_quote_libcomplet").find().toArray();
        res.status(201).json(quotes);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+});
+
+// prendre par id de l'user
+router.get('/client' , async (req, res) => {
+    try {
+        const userId = req.user["id"];
+        const quotes = await getQuotesByUser(userId);
+    res.status(201).json(quotes);
     } catch (error) {
         res.status(500).json({message: error.message});
     }
@@ -23,6 +34,7 @@ router.get('/:id', async (req, res) => {
         res.status(500).json({message: error.message});
     }
 });
+
 
 // prendre les devis par etat
 router.get('/state/:state', async (req, res) => {
