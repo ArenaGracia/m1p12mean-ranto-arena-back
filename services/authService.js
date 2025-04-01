@@ -14,7 +14,7 @@ const AuthService = {
         const valid = await bcrypt.compare(password, user.password);
         if (!valid) throw new Error('Invalid password');
 
-        let token = await getTokenValidUser(email, password);
+        let token = await getTokenValidUser(email);
 
         if(token == null){
             const secret_key = process.env.SECRET_KEY;
