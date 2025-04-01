@@ -13,6 +13,7 @@ async function getQuotesByState(stateValue) {
     }
 }
 
+// Devis et details devis
 async function getQuoteById(quoteId) {
     const quote = await mongoose.connection.db.collection("v_quote_libcomplet")
     .aggregate([
@@ -54,7 +55,6 @@ async function addDiscount(quoteId, discount) {
 
 async function validateNewDate (quoteId, newDate) {
     const quote = await updateQuoteState(quoteId, 2);
-    console.log("Appointment id " + quote.appointment_id + " new Date " + newDate);
     const appointment = await Appointment.findByIdAndUpdate(
         quote.appointment_id,
         { time_start: new Date(newDate) },
@@ -62,6 +62,7 @@ async function validateNewDate (quoteId, newDate) {
     );
     return {quote, appointment};
 }
+
 
 
 module.exports = {
