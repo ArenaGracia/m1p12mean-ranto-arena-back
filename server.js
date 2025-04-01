@@ -43,5 +43,6 @@ app.use('/api/prestations', require('./routes/prestationRoute'));
 app.use('/api/categories', require('./routes/categoryRoute'));
 app.use('/api/email', require('./routes/emailRoute'));
 app.use('/api/tasks', require('./routes/taskRoute'));
+app.use('/api/payment', require('./routes/paymentRoute'));
 
 module.exports = app;

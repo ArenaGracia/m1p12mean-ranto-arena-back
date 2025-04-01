@@ -121,9 +121,7 @@ db.createView (
 // Quote views
 
 // devis avec rendez-vous et user
-db.createView(
-    "v_quote_libcomplet",   
-    "quote",            
+db.createView( "v_quote_libcomplet",  "quote",            
     [ 
         {
             $lookup: {
@@ -144,13 +142,33 @@ db.createView(
         },
         { $unwind: "$appointment" },  
         {
+            $lookup: {
+                from: "v_quote_details_libcomplet",
+                localField: "_id",
+                foreignField: "quote_id",
+                as: "quote_details"
+            },
+        },  
+        {
+            $addFields: {
+                total_price: { $sum: "$quote_details.price" },
+                final_price: { 
+                    $subtract: [
+                        { $sum: "$quote_details.price" }, // Prix total
+                        { $multiply: [ {$sum: "$quote_details.price"}, {$divide: ["$discount", 100]} ] }
+                    ]
+                }
+            }
+        },
+        {
             $project: {
                 "appointment.appointment_state": 0,
                 "quote_state.state_id": 0,
                 "quote_state_id": 0,
-                "appointment_id": 0
+                "appointment_id": 0,
+                "quote_details": 0,
             }
-        } 
+        },
     ]
 )
 
@@ -191,21 +209,21 @@ db.createView(
     "v_quote_details_libcomplet",  
     "quote_details",               
     [
-      {
-        $lookup: {              
-          from: "v_prestation_brand_libcomplet",     
-          localField: "prestation_brand_id",   
-          foreignField: "_id",
-          as: "prestation_brand"         
+        {
+            $lookup: {              
+                from: "v_prestation_brand_libcomplet",     
+                localField: "prestation_brand_id",   
+                foreignField: "_id",
+                as: "prestation_brand"         
+            }
+        },
+        { $unwind: "$prestation_brand" },  
+        {
+            $project: {              
+                prestation_brand_id: 0, 
+                "prestation_brand.prestation.description": 0       
+            }
         }
-      },
-      { $unwind: "$prestation_brand" },  
-      {
-        $project: {              
-          prestation_brand_id: 0, 
-          "prestation_brand.prestation.description": 0       
-        }
-      }
     ]
 );
 
@@ -219,10 +237,29 @@ db.v_quote_libcomplet.aggregate([
             foreignField: "quote_id",
             as: "quote_details"
         },
+    },  
+    {
+        $addFields: {
+            total_price: { 
+                $sum: "$quote_details.price"
+            },
+            final_price: { 
+                $subtract: [
+                    { $sum: "$quote_details.price" }, // Prix total
+                    { 
+                        $multiply: [
+                            { $sum: "$quote_details.price" }, // Prix total
+                            { $divide: ["$discount", 100] } // Remise en %
+                        ]
+                    }
+                ]
+            }
+        }
     },
     {
         $project: {              
             "quote_details.quote_id": 0,
+            "total_price":0
         }
     }
 ]);
