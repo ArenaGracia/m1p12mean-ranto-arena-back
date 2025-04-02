@@ -2,6 +2,7 @@ const { Quote } = require('../models/Quote');
 const { getStateByValue } = require('./quoteStateService');
 const { default: mongoose } = require('mongoose');
 const { ObjectId } = mongoose.Types;
+const { Appointment } = require('../models/Appointment');
 
 async function getQuotesByState(stateValue) {
     try {
@@ -79,6 +80,7 @@ module.exports = {
     updateQuoteState,
     addDiscount,
     getQuoteById,
-    getQuotesByUser
+    getQuotesByUser,
+    validateNewDate
 }
 
