@@ -1,6 +1,7 @@
 const { Quote } = require('../models/Quote');
 const { getStateByValue } = require('./quoteStateService');
 const { default: mongoose } = require('mongoose');
+const { ObjectId } = require("mongoose").Types;
 
 async function getQuotesByState(stateValue) {
     try {
@@ -28,7 +29,7 @@ async function getQuoteById(quoteId) {
 async function getQuotesByUser(userId) {
     try {
         return await mongoose.connection.db.collection("v_quote_libcomplet")
-                        .find({ "appointment.user._id": new mongoose.Types.ObjectId(userId) })
+                        .find({ "appointment.user._id": new ObjectId(userId) })
                         .toArray();
     } catch (error) {
         throw new Error(`Error during getting the quote : ${error.message}`);
