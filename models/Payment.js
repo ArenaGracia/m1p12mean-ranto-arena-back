@@ -5,7 +5,7 @@ const PaymentSchema = new mongoose.Schema({
     date: { type: Date, required: true },
     quote_id: { type: mongoose.Schema.Types.ObjectId, required: true },
     quote: { type: mongoose.Schema.Types.ObjectId, ref: 'Quote' }
-}, { timestamps: true });
+}, { collection: "payment"}, { timestamps: true });
 
 
 module.exports = { 

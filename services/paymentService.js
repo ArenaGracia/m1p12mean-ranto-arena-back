@@ -15,6 +15,14 @@ async function createPayment (payment, amountLeft) {
     return newPayment.save();
 }
 
+async function getPaymentSummary (quoteId) {
+    const paymentSummary =  await mongoose.connection.db
+    .collection("v_quote_payment_summary")
+    .findOne({ quote_id: new ObjectId(quoteId) });
+    return paymentSummary;
+}
+
 module.exports = {
-    createPayment
+    createPayment,
+    getPaymentSummary
 }

@@ -205,6 +205,44 @@ db.createView ( "v_prestation_brand_libcomplet", "prestation_brand",
 )
 
 
+
+// details payement par devis
+
+db.createView("v_quote_payment_summary", "v_quote_libcomplet", [
+    {
+        $lookup: {
+            from: "payment",
+            localField: "_id",
+            foreignField: "quote_id",
+            as: "payments"
+        }
+    },
+    {
+        $unwind: {
+            path: "$payments",
+            preserveNullAndEmptyArrays: true
+        }
+    },
+    {
+        $group: {
+            _id: "$_id",
+            final_price: { $first: "$final_price" },
+            total_paid: { $sum: { $ifNull: ["$payments.amount", 0] } }
+        }
+    },
+    {
+        $project: {
+            _id: 0,
+            quote_id: "$_id",
+            total_paid: 1,
+            final_price: 1,
+            amount_remaining: { $subtract: ["$final_price", "$total_paid"] }
+        }
+    }
+]);
+
+
+
 db.createView(
     "v_quote_details_libcomplet",  
     "quote_details",               
@@ -217,7 +255,6 @@ db.createView(
                 as: "prestation_brand"         
             }
         },
-        { $unwind: "$prestation_brand" },  
         {
             $project: {              
                 prestation_brand_id: 0, 

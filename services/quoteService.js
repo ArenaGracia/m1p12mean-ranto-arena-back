@@ -1,6 +1,7 @@
 const { Quote } = require('../models/Quote');
 const { getStateByValue } = require('./quoteStateService');
 const { default: mongoose } = require('mongoose');
+const { ObjectId } = mongoose.Types;
 
 async function getQuotesByState(stateValue) {
     try {
