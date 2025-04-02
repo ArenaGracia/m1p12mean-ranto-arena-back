@@ -88,9 +88,7 @@ db.createView (
 // Quote views
 
 // devis avec rendez-vous et user
-db.createView(
-    "v_quote_libcomplet",   
-    "quote",            
+db.createView( "v_quote_libcomplet",  "quote",            
     [ 
         {
             $lookup: {
@@ -111,13 +109,33 @@ db.createView(
         },
         { $unwind: "$appointment" },  
         {
+            $lookup: {
+                from: "v_quote_details_libcomplet",
+                localField: "_id",
+                foreignField: "quote_id",
+                as: "quote_details"
+            },
+        },  
+        {
+            $addFields: {
+                total_price: { $sum: "$quote_details.price" },
+                final_price: { 
+                    $subtract: [
+                        { $sum: "$quote_details.price" }, // Prix total
+                        { $multiply: [ {$sum: "$quote_details.price"}, {$divide: ["$discount", 100]} ] }
+                    ]
+                }
+            }
+        },
+        {
             $project: {
                 "appointment.appointment_state": 0,
                 "quote_state.state_id": 0,
                 "quote_state_id": 0,
-                "appointment_id": 0
+                "appointment_id": 0,
+                "quote_details": 0,
             }
-        } 
+        },
     ]
 )
 
@@ -152,6 +170,44 @@ db.createView ( "v_prestation_brand_libcomplet", "prestation_brand",
         }
     ]
 )
+
+
+
+// details payement par devis
+
+db.createView("v_quote_payment_summary", "v_quote_libcomplet", [
+    {
+        $lookup: {
+            from: "payment",
+            localField: "_id",
+            foreignField: "quote_id",
+            as: "payments"
+        }
+    },
+    {
+        $unwind: {
+            path: "$payments",
+            preserveNullAndEmptyArrays: true
+        }
+    },
+    {
+        $group: {
+            _id: "$_id",
+            final_price: { $first: "$final_price" },
+            total_paid: { $sum: { $ifNull: ["$payments.amount", 0] } }
+        }
+    },
+    {
+        $project: {
+            _id: 0,
+            quote_id: "$_id",
+            total_paid: 1,
+            final_price: 1,
+            amount_remaining: { $subtract: ["$final_price", "$total_paid"] }
+        }
+    }
+]);
+
 
 
 db.createView(
@@ -190,10 +246,29 @@ db.v_quote_libcomplet.aggregate([
             foreignField: "quote_id",
             as: "quote_details"
         },
+    },  
+    {
+        $addFields: {
+            total_price: { 
+                $sum: "$quote_details.price"
+            },
+            final_price: { 
+                $subtract: [
+                    { $sum: "$quote_details.price" }, // Prix total
+                    { 
+                        $multiply: [
+                            { $sum: "$quote_details.price" }, // Prix total
+                            { $divide: ["$discount", 100] } // Remise en %
+                        ]
+                    }
+                ]
+            }
+        }
     },
     {
         $project: {              
             "quote_details.quote_id": 0,
+            "total_price":0
         }
     }
 ]);
