@@ -15,7 +15,7 @@ const roleMiddleware = (allowedRoles = []) => {
 };
 
 const isManager = roleMiddleware(['Manager']);
-const isMechanic = roleMiddleware(['Mécanicien']);
+const isMechanic = roleMiddleware(['Mecanicien']);
 const isClient = roleMiddleware(['Client']);
 
 module.exports = {

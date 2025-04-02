@@ -10,7 +10,7 @@ const QuoteStateSchema = new mongoose.Schema({
 
 const QuoteSchema = new mongoose.Schema({
     appointment_id: { type: mongoose.Schema.Types.ObjectId, ref: "Appointment", required: true },
-    appointment: { type: mongoose.Schema.Types.ObjectId, ref: "Appointment", required: true },
+    appointment: { type: mongoose.Schema.Types.ObjectId, ref: "Appointment" },
     total_price: { type: Number, map:'total_price', required: true },
     discount: { type: Number, required: true },
     quote_state_id: { type: mongoose.Schema.Types.ObjectId, ref: "QuoteState", required: true },

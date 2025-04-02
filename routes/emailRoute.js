@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 
-
 const  { sendEmail, getEmailExcuseTemplate } = require('../services/emailService');
 const { formateDate } = require('../utils/dateFormat');
 const { updateQuoteState, validateNewDate } = require('../services/quoteService');
@@ -12,8 +11,8 @@ router.post('/confirmation-new-date', async (req, res) => {
         const recipient = req.body.email;
         const newDate = formateDate(req.body.newDate);
         const oldDate = formateDate(req.body.oldDate);
-        const validatelink = 'http://localhost:5000/api/email/quote/validate-date-by-mail/' + req.body.idQuote + '/' + req.body.newDate;
-        const cancellink = 'http://localhost:5000/api/email/quote/decline-by-mail/' + req.body.idQuote;
+        const validatelink = process.env.API_URL + 'api/email/quote/validate-date-by-mail/' + req.body.idQuote + '/' + req.body.newDate;
+        const cancellink = process.env.API_URL + 'api/email/quote/decline-by-mail/' + req.body.idQuote;
         console.log("envoi email: " + recipient + " new Date: " + req.body.newDate + " old Date: " + oldDate + " idQuote: " + req.body.idQuote);
         const emailContent = getEmailExcuseTemplate(newDate, oldDate, validatelink, cancellink);
         await sendEmail (recipient, 'Confirmation Nouvelle date de rendez-vous', emailContent, res);
