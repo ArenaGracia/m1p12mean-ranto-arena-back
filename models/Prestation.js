@@ -2,7 +2,15 @@ const mongoose = require('mongoose');
 
 const CategorySchema = new mongoose.Schema({
     name: { type: String, required: true }, 
+    prestations: [{ type: mongoose.Schema.Types.ObjectId, ref: 'prestation' }]
 }, { collection: 'category' });
+
+const PrestationBrandSchema = new mongoose.Schema({
+    brand_id: { type: mongoose.Schema.Types.ObjectId, ref: 'brand'},
+    prestation_id: { type: mongoose.Schema.Types.ObjectId, ref: 'prestation' },
+    duration: {type: Number, required: true},
+    price: {type: Number, required: true}
+});
 
 const PrestationSchema = new mongoose.Schema({
     name: { type: String, required: true }, 
@@ -14,4 +22,5 @@ const PrestationSchema = new mongoose.Schema({
 module.exports = {
     Category: mongoose.model("Category", CategorySchema),
     Prestation: mongoose.model('Prestation', PrestationSchema),
+    PrestationBrand: mongoose.model('PrestationBrand', PrestationBrandSchema),
 };

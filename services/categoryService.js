@@ -1,6 +1,6 @@
-const Prestation = require("../models/Prestation");
 const { Category } = require("../models/Prestation");
-const { getPrestationByCategory } = require("./prestationService");
+const { default: mongoose } = require("mongoose");
+const { ObjectId } = require("mongoose").Types;
 
 async function getCategories() {
     const categories = await Category.find();
@@ -8,8 +8,10 @@ async function getCategories() {
 }
 
 async function getCategoryById(id) {
-    const prestations = await getPrestationByCategory(id);
-    return { prestations };
+    const category = await mongoose.connection.db
+        .collection("v_category_libcomplet")
+        .findOne({ _id: new ObjectId(id) });
+    return category ;
 }
 
 module.exports = {

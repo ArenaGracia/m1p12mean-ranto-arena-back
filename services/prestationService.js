@@ -2,6 +2,7 @@
 const { default: mongoose } = require("mongoose");
 const { Prestation } = require("../models/Prestation");
 const { ObjectId } = require("mongoose").Types;
+const { prepareImageToInsert } = require("../utils/imageUtils");
 
 async function getPrestationWithImage() {
     const prestations = await mongoose.connection.db.collection("v_prestation_libcomplet").find().toArray();
@@ -10,8 +11,7 @@ async function getPrestationWithImage() {
         if (p.image) {
             imageBase64 = `data:image/jpeg;base64,${p.image.toString('base64')}`;
         }
-        return { ...p, image: imageBase64,
-        };
+        return { ...p, image: imageBase64, };
     });
     return prestationsWithImages;
 }
@@ -35,32 +35,24 @@ async function getPrestationByCategory(categoryId) {
         if (p.image) {
             imageBase64 = `data:image/jpeg;base64,${p.image.toString('base64')}`;
         }
-        return { ...p, image: imageBase64,
-        };
+        return { ...p, image: imageBase64, };
     });
     return prestationsWithImages;
 }
 
 async function updatePrestation(id, prestationBody) {
-    try {
-        const prestation = await Prestation.findById(id);
-        if (!prestation) {
-            throw new Error ('Prestation non trouvée.' );
-        }
+    const prestation = await Prestation.findById(id);
 
-        prestation.name = prestationBody.name || prestation.name;
-        prestation.description = prestationBody.description || prestation.description;
-        prestation.category = prestationBody.category || prestation.category;
+    prestation.name = prestationBody.name || prestation.name;
+    prestation.description = prestationBody.description || prestation.description;
+    prestation.category = prestationBody.category || prestation.category;
 
-        if (prestationBody.image) {
-            prestation.image = prestationBody.image.replace(/\s/g, '');
-        }
-
-        await prestation.save();
-        return prestation;
-    } catch (error) {
-        throw new Error(error.message);
+    if (prestationBody.image) {
+        prestation.image = prepareImageToInsert(prestationBody.image);
     }
+
+    await prestation.save();
+    return prestation;
 }
 
 module.exports = {

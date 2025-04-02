@@ -7,10 +7,11 @@ const authMiddleware = require('./middlewares/authMiddleware');
 const app = express(); 
 const PORT = process.env.PORT || 5000; 
 
-const whitelist = ['https://m1p12mean-ranto-arena-front.vercel.app/']; // sites autorisés
+const whitelist = ['http://localhost:4200']; // sites autorisés
 
 const corsOptions = {
   origin: function (origin, callback) {
+    console.log(origin);
     if (!origin || whitelist.includes(origin)) {
       callback(null, true);
     } else {
@@ -44,4 +45,5 @@ app.use('/api/categories', require('./routes/categoryRoute'));
 app.use('/api/email', require('./routes/emailRoute'));
 app.use('/api/tasks', require('./routes/taskRoute'));
 
-module.exports = app;
+app.listen(PORT, () => console.log(`Serveur démarré sur le port 
+    ${PORT}`)); 

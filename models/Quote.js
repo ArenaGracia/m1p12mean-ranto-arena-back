@@ -1,5 +1,6 @@
 
 const mongoose = require('mongoose');
+const {AppointmentSchema} = require('./Appointment');
 
 const QuoteStateSchema = new mongoose.Schema({
     name: { type: String, required: true }, 
@@ -8,8 +9,9 @@ const QuoteStateSchema = new mongoose.Schema({
 }, { collection: 'quote_state' });
 
 const QuoteSchema = new mongoose.Schema({
-    appointment_id: { type: mongoose.Schema.Types.ObjectId, ref:"Appointment", required: true },
-    total_price: { type: Number, required: true },
+    appointment_id: { type: mongoose.Schema.Types.ObjectId, ref: "Appointment", required: true },
+    appointment: { type: mongoose.Schema.Types.ObjectId, ref: "Appointment", required: true },
+    total_price: { type: Number, map:'total_price', required: true },
     discount: { type: Number, required: true },
     quote_state_id: { type: mongoose.Schema.Types.ObjectId, ref: "QuoteState", required: true },
 }, { collection: 'quote' }, { timestamps: true });
