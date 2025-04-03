@@ -259,7 +259,7 @@ db.createView(
         { $unwind: "$prestation_brand" }, 
         { 
             $lookup: {
-                from: "task",
+                from: "v_task",
                 localField: "_id",  
                 foreignField: "quote_details_id",
                 as: "task"
@@ -340,6 +340,23 @@ db.v_quote_libcomplet.aggregate([
     }
 ]);
 
+db.createView("v_task", "task", [
+    {
+        $lookup: {
+            from: "task_state",           
+            localField: "task_state_id",   
+            foreignField: "_id",     
+            as: "task_state"
+        }
+    },
+    { $unwind: "$task_state" },
+    {
+        $project: {
+            "task_state_id": 0,  
+            "__v": 0
+        }
+    }
+]);
 
 db.createView("v_task_libcomplet", "task",
 [

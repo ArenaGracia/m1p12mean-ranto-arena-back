@@ -6,8 +6,8 @@ const {createTasks, getTasks, getNonAffectedTasks} = require('../services/TaskSe
 const { Task } = require('../models/Task');
 
 router.get("/", async (req, res) => {
-    const { page, size, state, userId, startDate, endDate, categoryId } = req.query;
-    const states = await getTasks(page, size, state, userId, startDate, endDate, categoryId);
+    const { page, size, stateId, userId, startDate, endDate, categoryId } = req.query;
+    const states = await getTasks(page, size, stateId, userId, startDate, endDate, categoryId);
     res.status(201).json(states);
 });
 

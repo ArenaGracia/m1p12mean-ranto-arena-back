@@ -1,5 +1,5 @@
 const { Quote } = require('../models/Quote');
-const { getStateByValue } = require('./quoteStateService');
+const { getQuoteStateByValue } = require('./stateService');
 const { default: mongoose } = require('mongoose');
 const { ObjectId } = mongoose.Types;
 const { Appointment } = require('../models/Appointment');
@@ -7,7 +7,7 @@ const {createTasks} = require('../services/TaskService');
 
 async function getQuotesByState(stateValue) {
     try {
-        const state = await getStateByValue(stateValue);
+        const state = await getQuoteStateByValue(stateValue);
         return await mongoose.connection.db.collection("v_quote_libcomplet").find({ "quote_state._id": state._id }).toArray();
     } catch (error) {
         throw new Error(`Error during getting the quote : ${error.message}`);
@@ -40,7 +40,7 @@ async function getQuotesByUser(userId) {
 
 async function updateQuoteState(quoteId, value) {
     try {
-        const state = await getStateByValue(value);
+        const state = await getQuoteStateByValue(value);
         const updatedQuote = await Quote.findByIdAndUpdate(
             quoteId,
             { quote_state_id: state._id },
