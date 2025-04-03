@@ -357,7 +357,7 @@ db.createView("v_task", "task", [
     }
 ]);
 
-db.createView("v_task_libcomplet", "task",
+db.createView("v_task_libcomplet", "v_task",
 [
     {
         $lookup: {
@@ -367,12 +367,7 @@ db.createView("v_task_libcomplet", "task",
             as: "quote_details"
         }
     },
-    { 
-        $unwind: { 
-            path: "$quote_details", 
-            preserveNullAndEmptyArrays: true 
-        } 
-    },
+    { $unwind: { path: "$quote_details", preserveNullAndEmptyArrays: true  }  },
     {
         $lookup: {
             from: "user", 
@@ -390,6 +385,7 @@ db.createView("v_task_libcomplet", "task",
             "task_state.state_id": 0,
             "state_task_id": 0,
             "quote_details_id": 0,
+            "quote_details.task": 0,
             "__v": 0
         }
     }
@@ -398,44 +394,19 @@ db.createView("v_task_libcomplet", "task",
 
 
 // View pour la performance des mecaniciens par tâche 
-
-db.createView("v_performance_per_task", "task", [
-    {
-        $lookup: {
-            from: "prestation_brand",
-            localField: "prestation_brand_id",
-            foreignField: "_id",
-            as: "prestation_brand"
-        }
-    },
-    { $unwind: "$prestation_brand" },
-    {
-        $lookup: {
-            from: "prestation",
-            localField: "prestation_brand.prestation_id",
-            foreignField: "_id",
-            as: "prestation"
-        }
-    },
-    { $unwind: "$prestation" },
-    {
-        $lookup: {
-            from: "user",
-            localField: "user_id",
-            foreignField: "_id",
-            as: "user"
-        }
-    },
-    { $unwind: "$user" },
+db.createView("v_performance_per_task", "v_task_libcomplet", [
     { $match: { estimated_duration: { $exists: true, $ne: null } } },
     {
         $addFields: {
             performance : {
-                $divide: [
-                    { $multiply: [ "$prestation_brand.duration", 100 ] },
-                    { $toDouble: "$estimated_duration" }
+                $multiply: [
+                    { $divide: [ "$estimated_duration", { $toDouble: "$quote_details.prestation_brand.duration" } ] },
+                    100
                 ]
-            }
+            },
+            prestation_duration : "$quote_details.prestation_brand.duration",
+            prestation : "$quote_details.prestation_brand.prestation.name",
+            category : "$quote_details.prestation_brand.prestation.category.name",
         }
     },
     {
@@ -444,9 +415,10 @@ db.createView("v_performance_per_task", "task", [
             "user._id": 1,
             "user.name": 1,
             "user.first_name": 1,
+            "prestation_duration": 1,
             "estimated_duration": 1,
-            "prestation_brand.duration": 1,
-            "prestation.name": 1,
+            "prestation": 1,
+            "category": 1,
             "performance": 1
         }
     }
