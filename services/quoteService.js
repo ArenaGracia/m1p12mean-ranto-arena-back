@@ -3,6 +3,7 @@ const { getStateByValue } = require('./quoteStateService');
 const { default: mongoose } = require('mongoose');
 const { ObjectId } = mongoose.Types;
 const { Appointment } = require('../models/Appointment');
+const {createTasks} = require('../services/TaskService');
 
 async function getQuotesByState(stateValue) {
     try {
@@ -40,12 +41,14 @@ async function getQuotesByUser(userId) {
 async function updateQuoteState(quoteId, value) {
     try {
         const state = await getStateByValue(value);
-        if (state.value === 3) return "Cette devis est déjà validé";
         const updatedQuote = await Quote.findByIdAndUpdate(
             quoteId,
             { quote_state_id: state._id },
             { new: true, runValidators: true }
         );
+        if (value === 3) { // si on va valider le devis, créer les tâches
+            await createTasks(quoteId);
+        }
         return updatedQuote;
     } catch (error) {
         console.log(error);

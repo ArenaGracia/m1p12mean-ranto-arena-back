@@ -242,7 +242,7 @@ db.createView("v_quote_payment_summary", "v_quote_libcomplet", [
 ]);
 
 
-
+// lié au prestation brand et à l'éventuel tâche
 db.createView(
     "v_quote_details_libcomplet",  
     "quote_details",               
@@ -253,6 +253,21 @@ db.createView(
                 localField: "prestation_brand_id",   
                 foreignField: "_id",
                 as: "prestation_brand"         
+            }
+        },
+        { $unwind: "$prestation_brand" }, 
+        { 
+            $lookup: {
+                from: "task",
+                localField: "_id",  
+                foreignField: "quote_details_id",
+                as: "task"
+            }
+        },
+        { 
+            $unwind: { 
+                path: "$task", 
+                preserveNullAndEmptyArrays: true
             }
         },
         {
@@ -305,15 +320,15 @@ db.v_quote_libcomplet.aggregate([
 db.createView("v_task_libcomplet", "task", [
     {
         $lookup: {
-            from: "v_prestation_brand_libcomplet",
-            localField: "prestation_brand_id",
+            from: "v_quote_details_libcomplet",
+            localField: "quote_details_id",
             foreignField: "_id",
-            as: "prestation_brand"
+            as: "quote_details"
         }
     },
     { 
         $unwind: { 
-            path: "$prestation_brand", 
+            path: "$quote_details", 
             preserveNullAndEmptyArrays: true 
         } 
     },
@@ -337,11 +352,73 @@ db.createView("v_task_libcomplet", "task", [
             "user.profile_id": 0,
             "task_state.state_id": 0,
             "state_task_id": 0,
-            "prestation_brand_id": 0,
+            "quote_details_id": 0,
             "__v": 0
         }
     }
 ]);
 
 
+
+// View pour la performance des mecaniciens par tâche 
+
+db.createView("v_performance_per_task", "task", [
+    {
+        $lookup: {
+            from: "prestation_brand",
+            localField: "prestation_brand_id",
+            foreignField: "_id",
+            as: "prestation_brand"
+        }
+    },
+    { $unwind: "$prestation_brand" },
+    {
+        $lookup: {
+            from: "prestation",
+            localField: "prestation_brand.prestation_id",
+            foreignField: "_id",
+            as: "prestation"
+        }
+    },
+    { $unwind: "$prestation" },
+    {
+        $lookup: {
+            from: "user",
+            localField: "user_id",
+            foreignField: "_id",
+            as: "user"
+        }
+    },
+    { $unwind: "$user" },
+    { $match: { estimated_duration: { $exists: true, $ne: null } } },
+    {
+        $addFields: {
+            performance : {
+                $divide: [
+                    { $multiply: [ "$prestation_brand.duration", 100 ] },
+                    { $toDouble: "$estimated_duration" }
+                ]
+            }
+        }
+    },
+    {
+        $project: {
+            "_id": 1,
+            "user._id": 1,
+            "user.name": 1,
+            "user.first_name": 1,
+            "estimated_duration": 1,
+            "prestation_brand.duration": 1,
+            "prestation.name": 1,
+            "performance": 1
+        }
+    }
+]);
+
+
+// prestation avancement 
+
+db.createView("v_prestation_avancement", "task", [
+    
+]);
 

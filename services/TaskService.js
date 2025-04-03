@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { ObjectId } = require('mongoose').Types;
 const { Appointment } = require('../models/Appointment');
-const Task = require('../models/Task');
+const {Task} = require('../models/Task');
 const { Quote } = require('../models/Quote');
 
 async function getTasks(page = 0, size = 10, state, userId, startDate, endDate, categoryId) {
@@ -46,10 +46,12 @@ async function createTasks(quoteId) {
     const quote = await Quote.findById(quoteId).populate("appointment_id");
     const dateStart = new Date(quote.appointment_id.time_start);
     const tasks = quoteDetails.map(detail => {
+        console.log("details id : " + detail._id);
         const task = new Task({
             state: 0,
             date_start: new Date(dateStart),
-            prestation_brand_id: detail.prestation_brand._id
+            // prestation_brand_id: detail.prestation_brand._id
+            quote_details_id: detail._id
         });
         dateStart.setMinutes(dateStart.getMinutes() + detail.prestation_brand.duration);
         return task.save();
