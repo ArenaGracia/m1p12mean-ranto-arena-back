@@ -6,12 +6,12 @@ const ProfileSchema = new mongoose.Schema({
 
 const UserSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    firstName: { type: String, map:"first_name", required: true },
+    first_name: { type: String, map:"first_name", required: true },
     email: { type: String, required: true },
     password: { type: String, required: true },
     contact: { type: String, required: true },
     profile_id: { type: mongoose.Schema.Types.ObjectId, ref: "Profile", required: true }
-}, {collection: "user"}, { timestamps: true });
+}, {collection: "user" , timestamps: true });
 
 module.exports = {
     Profile: mongoose.model("Profile", ProfileSchema),
