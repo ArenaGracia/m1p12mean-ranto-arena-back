@@ -245,6 +245,43 @@ db.createView("v_quote_payment_summary", "v_quote_libcomplet", [
 
 // lié au prestation brand et à l'éventuel tâche
 db.createView(
+    "v_quote_details_libcomplet",  
+    "quote_details",               
+    [
+        {
+            $lookup: {              
+                from: "v_prestation_brand_libcomplet",     
+                localField: "prestation_brand_id",   
+                foreignField: "_id",
+                as: "prestation_brand"         
+            }
+        },
+        { $unwind: "$prestation_brand" }, 
+        { 
+            $lookup: {
+                from: "task",
+                localField: "_id",  
+                foreignField: "quote_details_id",
+                as: "task"
+            }
+        },
+        { 
+            $unwind: { 
+                path: "$task", 
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $project: {              
+                prestation_brand_id: 0, 
+                "prestation_brand.prestation.description": 0       
+            }
+        }
+    ]
+);
+
+
+db.createView(
     "v_car_brand",   
     "car",            
     [
