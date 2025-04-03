@@ -2,8 +2,6 @@ db.createView(
     "v_prestation_libcomplet",   
     "prestation",            
     [
-<<<<<<< HEAD
-=======
         {
             $lookup: {
             from: "category",           
@@ -19,48 +17,6 @@ db.createView(
             }
         }
     ]
-<<<<<<< Updated upstream
-  )
-  
-
-db.createView(
-    "v_category_libcomplet",  
-    "category",               
-    [
->>>>>>> develop
-      {
-<<<<<<< Updated upstream
-        $lookup: {
-          from: "category",           
-          localField: "category_id",   
-          foreignField: "_id",     
-          as: "category"
-=======
-        $lookup: {              
-          from: "prestation",     
-          localField: "_id",   
-          foreignField: "category_id",
-          as: "prestations"         
-        }
-      }
-    ]
-);
-
-db.createView(
-  "v_token_user",  
-  "token_user",               
-  [
-    {
-      $lookup: {              
-        from: "user",     
-        localField: "user_id",   
-        foreignField: "_id",
-        as: "user"         
-      }
-    },
-    { $unwind: "$user" },   
-  ]
-=======
 );
 
 db.createView(
@@ -156,9 +112,26 @@ db.createView("v_task_libcomplet", "task",
         }
     }
 ]
->>>>>>> Stashed changes
 );
   
+db.createView ("v_user", "user", [
+    {
+        $lookup: {
+            from: "profile",           
+            localField: "profile_id",   
+            foreignField: "_id",     
+            as: "profile"
+        }
+    },
+    { $unwind: "$profile" },   
+    {
+        $project: {
+            "profile_id": 0,
+            "profile.user_id": 0,            
+            "user.password": 0,      
+        }
+    }
+]);
   
 // Appointment View jointure user & car & state
 db.createView (
@@ -337,26 +310,21 @@ db.createView(
     "v_quote_details_libcomplet",  
     "quote_details",               
     [
-      {
-        $lookup: {              
-          from: "v_prestation_brand_libcomplet",     
-          localField: "prestation_brand_id",   
-          foreignField: "_id",
-          as: "prestation_brand"         
->>>>>>> Stashed changes
+        {
+            $lookup: {              
+                from: "v_prestation_brand_libcomplet",     
+                localField: "prestation_brand_id",   
+                foreignField: "_id",
+                as: "prestation_brand"         
+            }
+        },
+        {
+            $project: {              
+                prestation_brand_id: 0, 
+                "prestation_brand.prestation.description": 0       
+            }
         }
-      },
-      { $unwind: "$category" },   
-      {
-        $project: {
-          category_id : 0 
-        }
-      }
     ]
-<<<<<<< Updated upstream
-  )
-  
-=======
 );
 
 
@@ -397,31 +365,38 @@ db.v_quote_libcomplet.aggregate([
 ]);
 
 
-db.createView("v_task_libcomplet", "task",
-[
+db.createView("v_task_libcomplet", "task", [
     {
         $lookup: {
-            from: "v_prestation_brand_libcomplet", 
+            from: "v_prestation_brand_libcomplet",
             localField: "prestation_brand_id",
             foreignField: "_id",
             as: "prestation_brand"
         }
     },
-    { $unwind: "$prestation_brand" }, 
-    
+    { 
+        $unwind: { 
+            path: "$prestation_brand", 
+            preserveNullAndEmptyArrays: true 
+        } 
+    },
     {
         $lookup: {
-            from: "user", 
-            localField: "user_id", 
+            from: "user",
+            localField: "user_id",
             foreignField: "_id",
             as: "user"
         }
     },
-    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+    {
+        $addFields: {
+            user: { $arrayElemAt: ["$user", 0] } // Sélectionne uniquement le premier élément du tableau
+        }
+    },
     {
         $project: {
-            "user.password": 0,  
-            "user.contact": 0, 
+            "user.password": 0,
+            "user.contact": 0,
             "user.profile_id": 0,
             "task_state.state_id": 0,
             "state_task_id": 0,
@@ -429,6 +404,7 @@ db.createView("v_task_libcomplet", "task",
             "__v": 0
         }
     }
-]
-);
->>>>>>> Stashed changes
+]);
+
+
+
