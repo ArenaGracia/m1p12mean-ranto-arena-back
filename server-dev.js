@@ -43,7 +43,7 @@ app.use('/api/quotes', require('./routes/quoteRoute'));
 app.use('/api/prestations', require('./routes/prestationRoute'));
 app.use('/api/categories', require('./routes/categoryRoute'));
 app.use('/api/email', require('./routes/emailRoute'));
-app.use('/api/tasks', require('./routes/taskRoute'));
+// app.use('/api/tasks', require('./routes/taskRoute'));
 app.use('/api/cars', require('./routes/carRoute'));
 app.use('/api/brands', require('./routes/brandRoute'));
 
