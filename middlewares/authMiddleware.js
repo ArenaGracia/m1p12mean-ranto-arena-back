@@ -4,6 +4,7 @@ const EXCLUDED_PATHS = [
     '/auth/login',
     '/api/prestations',
     '/api/categories',
+    '/api/brands',
     '/email/'
 ];
 

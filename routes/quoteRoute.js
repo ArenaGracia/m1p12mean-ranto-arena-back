@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Types;
 const { QuoteState, Quote } = require('../models/Quote');
 const { getQuotesByState, updateQuoteState, addDiscount, getQuoteById, getQuotesByUser } = require('../services/quoteService');
+const { sendEmail } = require('../services/emailService');
 
 // prendre toutes les devis
 router.get('/', async (req, res) => {
@@ -63,6 +64,16 @@ router.put('/decline/:id', async (req, res) => {
     try {
         const quotes = await updateQuoteState(req.params.id, 4);
         res.status(201).json(quotes);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+});
+
+// annuler un devis
+router.put('/cancel/:id', async (req, res) => {
+    try {
+        const quotes = await updateQuoteState(req.params.id, 4);
+        await sendEmail (req.body.email, "Annulation de Devis", "Nous vous informons que votre devis a été annulé", res);
     } catch (error) {
         res.status(500).json({message: error.message});
     }
