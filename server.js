@@ -41,6 +41,13 @@ app.use('/api/quotes', require('./routes/quoteRoute'));
 app.use('/api/prestations', require('./routes/prestationRoute'));
 app.use('/api/categories', require('./routes/categoryRoute'));
 app.use('/api/email', require('./routes/emailRoute'));
+<<<<<<< Updated upstream
+=======
+app.use('/api/tasks', require('./routes/taskRoute'));
+app.use('/api/payment', require('./routes/paymentRoute'));
+app.use('/api/cars', require('./routes/carRoute'));
+app.use('/api/brands', require('./routes/brandRoute'));
+>>>>>>> Stashed changes
 
 app.listen(PORT, () => console.log(`Serveur démarré sur le port 
 ${PORT}`)); 
