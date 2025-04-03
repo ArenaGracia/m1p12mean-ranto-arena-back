@@ -4,11 +4,7 @@ const EXCLUDED_PATHS = [
     '/auth/login',
     '/api/prestations',
     '/api/categories',
-<<<<<<< Updated upstream
-=======
     '/api/brands',
-    '/email/'
->>>>>>> Stashed changes
     '/email/'
 ];
 
