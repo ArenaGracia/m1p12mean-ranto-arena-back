@@ -8,7 +8,6 @@ const { default: mongoose } = require('mongoose');
 router.get('/', async (req, res) => {
     try {
         const userId = req.user["id"];
-        console.log("fjbk");
         
         const cars = await getCarByUser(userId);
         res.json(cars);
@@ -19,20 +18,14 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        console.log(req.body);
-        
 
         const { license_plate_number, brand } = req.body;
         
-
         const newCar = new Car ({
             license_plate_number,
             "brand_id":  new mongoose.Types.ObjectId(brand._id),
             "user_id" :   new mongoose.Types.ObjectId(req.user["id"])
         });
-
-        console.log(newCar);
-        
 
         const savedCar = await newCar.save();
         res.status(201).json(savedCar);

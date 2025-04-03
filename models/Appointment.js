@@ -14,7 +14,7 @@ const AppointmentSchema = new mongoose.Schema({
     time_end: { type: Date, required: true },
     real_time_start: { type: Date, required: true },
     real_time_end: { type: Date, required: true },
-    appointment_state_id: { type: mongoose.Schema.Types.ObjectId, ref: "AppointmentState", required: true },
+    state_appointment_id: { type: mongoose.Schema.Types.ObjectId, ref: "AppointmentState", required: true },
 }, { collection: 'appointment' }, { timestamps: true });
 
 

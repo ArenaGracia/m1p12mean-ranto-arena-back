@@ -11,7 +11,7 @@ router.post('/login', async (req, res) => {
         const token = await authService.authenticate(email, password);
         res.json({ token });
     } catch (err) {
-        res.status(401).json({ message: err.message });
+        res.status(500).json({ message: err.message });
     }
 });
 
@@ -21,8 +21,6 @@ router.post('/client/sign-up', async (req, res) => {
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        console.log("hashedPassword : " + hashedPassword);
-
         const user = new User({
             name,
             first_name,
@@ -37,7 +35,7 @@ router.post('/client/sign-up', async (req, res) => {
         const token = await authService.authenticate(email, password);
         res.json({ token });
     } catch (err) {
-        res.status(401).json({ message: err.message });
+        res.status(500).json({ message: err.message });
     }
 });
 

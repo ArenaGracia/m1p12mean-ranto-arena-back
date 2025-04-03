@@ -78,6 +78,7 @@ async function validateNewDate (quoteId, newDate) {
 
 
 
+
 module.exports = {
     getQuotesByState,
     updateQuoteState,

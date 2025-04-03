@@ -82,7 +82,6 @@ router.put('/cancel/:id', async (req, res) => {
 // ajouter une remise
 router.put('/discount/:id', async (req, res) => {
     try {
-        console.log('discount :' + req.body.discount + ' id' + req.params.id);
         const UpdatedQuote = await addDiscount(req.params.id, req.body.discount);
         res.status(201).json(UpdatedQuote);
     } catch (error) {

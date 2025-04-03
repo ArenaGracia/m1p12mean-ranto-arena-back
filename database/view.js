@@ -163,7 +163,6 @@ db.createView( "v_quote_libcomplet",  "quote",
         },
         {
             $project: {
-                "appointment.appointment_state": 0,
                 "quote_state.state_id": 0,
                 "quote_state_id": 0,
                 "appointment_id": 0,
@@ -452,11 +451,3 @@ db.createView("v_performance_per_task", "task", [
         }
     }
 ]);
-
-
-// prestation avancement 
-
-db.createView("v_prestation_avancement", "task", [
-    
-]);
-
