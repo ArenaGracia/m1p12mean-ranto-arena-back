@@ -1,5 +1,5 @@
 const { Quote } = require('../models/Quote');
-const { getQuoteStateByValue } = require('./stateService');
+const { getQuoteStateByValue,getAppointmentStateByValue } = require('./stateService');
 const { default: mongoose } = require('mongoose');
 const { ObjectId } = mongoose.Types;
 const { Appointment } = require('../models/Appointment');
@@ -67,10 +67,11 @@ async function addDiscount(quoteId, discount) {
 }
 
 async function validateNewDate (quoteId, newDate) {
-    const quote = await updateQuoteState(quoteId, 2);
+    const quote = await updateQuoteState(quoteId, 3);
+    const appointmentstate = await getAppointmentStateByValue(2);
     const appointment = await Appointment.findByIdAndUpdate(
         quote.appointment_id,
-        { time_start: new Date(newDate) },
+        { time_start: new Date(newDate), state_appointment_id: appointmentstate._id },
         { new: true, runValidators: true }
     );
     return {quote, appointment};

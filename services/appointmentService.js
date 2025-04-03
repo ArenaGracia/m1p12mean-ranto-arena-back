@@ -32,7 +32,7 @@ async function endAppointment (idAppointment, quoteId, amountLeft) {
     const state = await getAppointmentStateByValue(3);
     return await Appointment.findByIdAndUpdate(
         idAppointment,
-        { state_appointment_id: state._id },
+        { state_appointment_id: state._id, time_end: new Date() },
         { new: true, runValidators: true }
     );
 }

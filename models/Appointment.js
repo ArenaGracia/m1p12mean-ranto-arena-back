@@ -12,8 +12,6 @@ const AppointmentSchema = new mongoose.Schema({
     car_id: { type: mongoose.Schema.Types.ObjectId, ref: "Car", required: true },
     time_start: { type: Date, required: true  },
     time_end: { type: Date, required: true },
-    real_time_start: { type: Date, required: true },
-    real_time_end: { type: Date, required: true },
     state_appointment_id: { type: mongoose.Schema.Types.ObjectId, ref: "AppointmentState", required: true },
 }, { collection: 'appointment' }, { timestamps: true });
 
