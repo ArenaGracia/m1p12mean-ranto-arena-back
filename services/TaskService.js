@@ -10,7 +10,7 @@ async function getTasks(page = 0, size = 10, stateId, userId, startDate, endDate
     const filter = {};
 
     if (stateId)
-        filter["task_state_id"] = new mongoose.Types.ObjectId(stateId);
+        filter["task_state._id"] = new mongoose.Types.ObjectId(stateId);
 
     if (userId)
         filter["user._id"] = new mongoose.Types.ObjectId(userId);

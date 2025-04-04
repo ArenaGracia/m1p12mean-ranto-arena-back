@@ -4,6 +4,18 @@ const { Prestation } = require("../models/Prestation");
 const { ObjectId } = require("mongoose").Types;
 const { prepareImageToInsert } = require("../utils/imageUtils");
 
+async function createPrestation (prestation) {
+    const { name, description, image, category } = prestation;
+    imagePrepared = prepareImageToInsert(image);
+    const newPrestation = new Prestation({
+        name,
+        description,
+        image: imagePrepared,
+        category_id: category._id
+    });
+    return await newPrestation.save();
+}
+
 async function getPrestationWithImage() {
     const prestations = await mongoose.connection.db.collection("v_prestation_libcomplet").find().toArray();
     const prestationsWithImages = prestations.map(p => {
@@ -59,5 +71,6 @@ module.exports = {
     getPrestationWithImage,
     getPrestationById,
     getPrestationByCategory,
+    createPrestation,
     updatePrestation
 }

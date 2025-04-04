@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const { Category, Prestation } = require("../models/Prestation");
-const { getPrestationWithImage, getPrestationById, updatePrestation } = require("../services/prestationService");
+const { getPrestationWithImage, getPrestationById, updatePrestation, createPrestation } = require("../services/prestationService");
+const BrandService = require('../services/brandService');
 
 router.get('/', async (req, res) => {
     try {
@@ -24,18 +25,12 @@ router.get('/:id', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        const { name, description, image, category } = req.body;
-
-        const newPrestation = new Prestation({
-            name,
-            description,
-            image,
-            category
-        });
-
-        const savedPrestation = await newPrestation.save();
+        console.log(`Taille de l'image reçue : ${req.body.prestation.image.length} caractères`);
+        const savedPrestation = await createPrestation(req.body.prestation);
+        await BrandService.createBrands(req.body.brands, savedPrestation._id);
         res.status(201).json(savedPrestation);
     } catch (error) {
+        console.log(error.message);
         res.status(400).json({ message: error.message });
     }
 });
