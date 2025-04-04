@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const { ObjectId} = mongoose.Types;
-const {createTasks, getTasks, getNonAffectedTasks} = require('../services/TaskService');
+const {createTasks, getTasks, getNonAffectedTasks, endTask} = require('../services/TaskService');
 const { Task } = require('../models/Task');
 
 router.get("/", async (req, res) => {
@@ -47,5 +47,13 @@ router.put('/affect', async (req, res) => {
     }
 });
 
+router.put('/end', async (req, res) => {
+    try {
+        const updatedTask = await endTask(req.body.taskId, req.body.estimatedDuration);
+        res.status(201).json(updatedTask);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+});
 
 module.exports = router;

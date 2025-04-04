@@ -59,8 +59,19 @@ async function createTasks(quoteId) {
     await Promise.all(tasks);
 }
 
+async function endTask(taskId, estimated_duration) {
+    const taskState = await getTaskStateByValue(3);
+    const updatedTask = await Task.findByIdAndUpdate(
+        taskId,
+        { task_state_id: taskState._id, estimated_duration: estimated_duration },
+        { new: true, runValidators: true }
+    );
+    return updatedTask;
+}
+
 module.exports = {
     createTasks,
     getTasks,
-    getNonAffectedTasks
+    getNonAffectedTasks,
+    endTask
 }
