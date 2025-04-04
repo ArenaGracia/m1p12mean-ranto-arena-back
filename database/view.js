@@ -17,102 +17,40 @@ db.createView(
             }
         }
     ]
-);
+  )
+  
 
 db.createView(
-    "v_car_brand",   
-    "car",            
+    "v_category_libcomplet",  
+    "category",               
     [
       {
-        $lookup: {
-          from: "brand",           
-          localField: "brand_id",   
-          foreignField: "_id",     
-          as: "brand"
-        }
-      },
-      { $unwind: "$brand" },   
-      {
-        $project: {
-          brand_id : 0,
-          "brand.image" : 0
+        $lookup: {              
+          from: "prestation",     
+          localField: "_id",   
+          foreignField: "category_id",
+          as: "prestations"         
         }
       }
     ]
 );
 
-
-// Devis avec liste details devis
-db.v_quote_libcomplet.aggregate([
+db.createView(
+  "v_token_user",  
+  "token_user",               
+  [
     {
-        $lookup: {
-            from: "v_quote_details_libcomplet",
-            localField: "_id",
-            foreignField: "quote_id",
-            as: "quote_details"
-        },
-    },  
-    {
-        $addFields: {
-            total_price: { 
-                $sum: "$quote_details.price"
-            },
-            final_price: { 
-                $subtract: [
-                    { $sum: "$quote_details.price" }, // Prix total
-                    { 
-                        $multiply: [
-                            { $sum: "$quote_details.price" }, // Prix total
-                            { $divide: ["$discount", 100] } // Remise en %
-                        ]
-                    }
-                ]
-            }
-        }
+      $lookup: {              
+        from: "user",     
+        localField: "user_id",   
+        foreignField: "_id",
+        as: "user"         
+      }
     },
-    {
-        $project: {              
-            "quote_details.quote_id": 0,
-            "total_price":0
-        }
-    }
-]);
-
-
-db.createView("v_task_libcomplet", "task",
-[
-    {
-        $lookup: {
-            from: "v_prestation_brand_libcomplet", 
-            localField: "prestation_brand_id",
-            foreignField: "_id",
-            as: "prestation_brand"
-        }
-    },
-    { $unwind: "$prestation_brand" }, 
-    
-    {
-        $lookup: {
-            from: "user", 
-            localField: "user_id", 
-            foreignField: "_id",
-            as: "user"
-        }
-    },
-    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
-    {
-        $project: {
-            "user.password": 0,  
-            "user.contact": 0, 
-            "user.profile_id": 0,
-            "task_state.state_id": 0,
-            "state_task_id": 0,
-            "prestation_brand_id": 0,
-            "__v": 0
-        }
-    }
-]
+    { $unwind: "$user" },   
+  ]
 );
+
   
 db.createView ("v_user", "user", [
     {
@@ -225,7 +163,6 @@ db.createView( "v_quote_libcomplet",  "quote",
         },
         {
             $project: {
-                "appointment.appointment_state": 0,
                 "quote_state.state_id": 0,
                 "quote_state_id": 0,
                 "appointment_id": 0,
@@ -305,7 +242,7 @@ db.createView("v_quote_payment_summary", "v_quote_libcomplet", [
 ]);
 
 
-
+// lié au prestation brand et à l'éventuel tâche
 db.createView(
     "v_quote_details_libcomplet",  
     "quote_details",               
@@ -318,12 +255,50 @@ db.createView(
                 as: "prestation_brand"         
             }
         },
+        { $unwind: "$prestation_brand" }, 
+        { 
+            $lookup: {
+                from: "v_task",
+                localField: "_id",  
+                foreignField: "quote_details_id",
+                as: "task"
+            }
+        },
+        { 
+            $unwind: { 
+                path: "$task", 
+                preserveNullAndEmptyArrays: true
+            }
+        },
         {
             $project: {              
                 prestation_brand_id: 0, 
                 "prestation_brand.prestation.description": 0       
             }
         }
+    ]
+);
+
+
+db.createView(
+    "v_car_brand",   
+    "car",            
+    [
+      {
+        $lookup: {
+          from: "brand",           
+          localField: "brand_id",   
+          foreignField: "_id",     
+          as: "brand"
+        }
+      },
+      { $unwind: "$brand" },   
+      {
+        $project: {
+          brand_id : 0,
+          "brand.image" : 0
+        }
+      }
     ]
 );
 
@@ -364,43 +339,53 @@ db.v_quote_libcomplet.aggregate([
     }
 ]);
 
-
-db.createView("v_task_libcomplet", "task", [
+db.createView("v_task", "task", [
     {
         $lookup: {
-            from: "v_prestation_brand_libcomplet",
-            localField: "prestation_brand_id",
-            foreignField: "_id",
-            as: "prestation_brand"
+            from: "task_state",           
+            localField: "task_state_id",   
+            foreignField: "_id",     
+            as: "task_state"
         }
     },
-    { 
-        $unwind: { 
-            path: "$prestation_brand", 
-            preserveNullAndEmptyArrays: true 
-        } 
-    },
+    { $unwind: "$task_state" },
+    {
+        $project: {
+            "task_state_id": 0,  
+            "__v": 0
+        }
+    }
+]);
+
+db.createView("v_task_libcomplet", "v_task",
+[
     {
         $lookup: {
-            from: "user",
-            localField: "user_id",
+            from: "v_quote_details_libcomplet",
+            localField: "quote_details_id",
+            foreignField: "_id",
+            as: "quote_details"
+        }
+    },
+    { $unwind: { path: "$quote_details", preserveNullAndEmptyArrays: true  }  },
+    {
+        $lookup: {
+            from: "user", 
+            localField: "user_id", 
             foreignField: "_id",
             as: "user"
         }
     },
-    {
-        $addFields: {
-            user: { $arrayElemAt: ["$user", 0] } // Sélectionne uniquement le premier élément du tableau
-        }
-    },
+    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
     {
         $project: {
-            "user.password": 0,
-            "user.contact": 0,
+            "user.password": 0,  
+            "user.contact": 0, 
             "user.profile_id": 0,
             "task_state.state_id": 0,
             "state_task_id": 0,
-            "prestation_brand_id": 0,
+            "quote_details_id": 0,
+            "quote_details.task": 0,
             "__v": 0
         }
     }
@@ -408,3 +393,33 @@ db.createView("v_task_libcomplet", "task", [
 
 
 
+// View pour la performance des mecaniciens par tâche 
+db.createView("v_performance_per_task", "v_task_libcomplet", [
+    { $match: { estimated_duration: { $exists: true, $ne: null } } },
+    {
+        $addFields: {
+            performance : {
+                $multiply: [
+                    { $divide: [ "$estimated_duration", { $toDouble: "$quote_details.prestation_brand.duration" } ] },
+                    100
+                ]
+            },
+            prestation_duration : "$quote_details.prestation_brand.duration",
+            prestation : "$quote_details.prestation_brand.prestation.name",
+            category : "$quote_details.prestation_brand.prestation.category.name",
+        }
+    },
+    {
+        $project: {
+            "_id": 1,
+            "user._id": 1,
+            "user.name": 1,
+            "user.first_name": 1,
+            "prestation_duration": 1,
+            "estimated_duration": 1,
+            "prestation": 1,
+            "category": 1,
+            "performance": 1
+        }
+    }
+]);

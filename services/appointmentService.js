@@ -1,5 +1,7 @@
 const { default: mongoose } = require("mongoose");
 const {Appointment} = require('../models/Appointment');
+const { getPaymentSummary } = require('../services/paymentService');
+const { getAppointmentStateByValue } = require('../services/stateService');
 
 async function getAppointmentsForCalendar(startDate, endDate) {
     console.log("Prendre les rendez-vous entre : " + startDate + " à " + endDate);
@@ -20,8 +22,22 @@ async function getAppointmentsForCalendar(startDate, endDate) {
     }));
 }
 
-
+async function endAppointment (idAppointment, quoteId, amountLeft) {
+    if (!amountLeft && quoteId) {
+        const summary = await getPaymentSummary(quoteId);
+        amountLeft = summary.amount_remaining;
+    }
+    if (amountLeft != 0)
+        throw new Error("Il reste encore " + amountLeft + " Ar à payer");
+    const state = await getAppointmentStateByValue(3);
+    return await Appointment.findByIdAndUpdate(
+        idAppointment,
+        { state_appointment_id: state._id, time_end: new Date() },
+        { new: true, runValidators: true }
+    );
+}
 
 module.exports = {
-    getAppointmentsForCalendar
+    getAppointmentsForCalendar,
+    endAppointment
 }

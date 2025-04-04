@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const { ObjectId } = mongoose.Types;
-const { QuoteState, Quote } = require('../models/Quote');
 const { getQuotesByState, updateQuoteState, addDiscount, getQuoteById, getQuotesByUser } = require('../services/quoteService');
 const { sendEmail } = require('../services/emailService');
+const { getAppointmentStateByValue } = require('../services/stateService');
+const { Appointment } = require('../models/Appointment');
 
 // prendre toutes les devis
 router.get('/', async (req, res) => {
@@ -53,6 +53,12 @@ router.get('/state/:state', async (req, res) => {
 router.put('/validate/:id', async (req, res) => {
     try {
         const quote = await updateQuoteState(req.params.id, 3);
+        const state = await getAppointmentStateByValue(2);
+        await Appointment.findByIdAndUpdate(
+            quote.appointment_id,
+            { state_appointment_id: state._id },
+            { new: true, runValidators: true }
+        );
         res.status(201).json(quote);
     } catch (error) {
         res.status(500).json({message: error.message});
@@ -82,7 +88,6 @@ router.put('/cancel/:id', async (req, res) => {
 // ajouter une remise
 router.put('/discount/:id', async (req, res) => {
     try {
-        console.log('discount :' + req.body.discount + ' id' + req.params.id);
         const UpdatedQuote = await addDiscount(req.params.id, req.body.discount);
         res.status(201).json(UpdatedQuote);
     } catch (error) {

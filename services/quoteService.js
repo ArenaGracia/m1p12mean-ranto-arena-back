@@ -1,12 +1,13 @@
 const { Quote } = require('../models/Quote');
-const { getStateByValue } = require('./quoteStateService');
+const { getQuoteStateByValue,getAppointmentStateByValue } = require('./stateService');
 const { default: mongoose } = require('mongoose');
 const { ObjectId } = mongoose.Types;
 const { Appointment } = require('../models/Appointment');
+const {createTasks} = require('../services/TaskService');
 
 async function getQuotesByState(stateValue) {
     try {
-        const state = await getStateByValue(stateValue);
+        const state = await getQuoteStateByValue(stateValue);
         return await mongoose.connection.db.collection("v_quote_libcomplet").find({ "quote_state._id": state._id }).toArray();
     } catch (error) {
         throw new Error(`Error during getting the quote : ${error.message}`);
@@ -39,13 +40,15 @@ async function getQuotesByUser(userId) {
 
 async function updateQuoteState(quoteId, value) {
     try {
-        const state = await getStateByValue(value);
-        if (state.value === 3) return "Cette devis est déjà validé";
+        const state = await getQuoteStateByValue(value);
         const updatedQuote = await Quote.findByIdAndUpdate(
             quoteId,
             { quote_state_id: state._id },
             { new: true, runValidators: true }
         );
+        if (value === 3) { // si on va valider le devis, créer les tâches
+            await createTasks(quoteId);
+        }
         return updatedQuote;
     } catch (error) {
         console.log(error);
@@ -64,14 +67,16 @@ async function addDiscount(quoteId, discount) {
 }
 
 async function validateNewDate (quoteId, newDate) {
-    const quote = await updateQuoteState(quoteId, 2);
+    const quote = await updateQuoteState(quoteId, 3);
+    const appointmentstate = await getAppointmentStateByValue(2);
     const appointment = await Appointment.findByIdAndUpdate(
         quote.appointment_id,
-        { time_start: new Date(newDate) },
+        { time_start: new Date(newDate), state_appointment_id: appointmentstate._id },
         { new: true, runValidators: true }
     );
     return {quote, appointment};
 }
+
 
 
 
