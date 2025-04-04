@@ -9,8 +9,8 @@ const PrestationBrandSchema = new mongoose.Schema({
     brand_id: { type: mongoose.Schema.Types.ObjectId, ref: 'brand'},
     prestation_id: { type: mongoose.Schema.Types.ObjectId, ref: 'prestation' },
     duration: {type: Number, required: true},
-    price: {type: Number, required: true}
-});
+    price: {type: mongoose.Schema.Types.Double, required: true}
+}, { collection: 'prestation_brand' });
 
 const PrestationSchema = new mongoose.Schema({
     name: { type: String, required: true }, 
