@@ -1,7 +1,6 @@
 const AuthService = require('../services/authService');
 
 const EXCLUDED_PATHS = [
-    '/auth/login',
     '/auth/client/sign-up',
     '/api/prestations',
     '/api/categories',
