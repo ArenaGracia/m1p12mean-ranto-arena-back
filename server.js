@@ -48,5 +48,7 @@ app.use('/api/payment', require('./routes/paymentRoute'));
 app.use('/api/cars', require('./routes/carRoute'));
 app.use('/api/brands', require('./routes/brandRoute'));
 app.use('/api/appointment', require('./routes/appointmentRoute'));
+app.use('/api/articles', require('./routes/articleRoute'));
+app.use('/api/categoriesArticle', require('./routes/categoryArticleRoute'));
 
 module.exports = app;

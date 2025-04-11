@@ -423,3 +423,29 @@ db.createView("v_performance_per_task", "v_task_libcomplet", [
         }
     }
 ]);
+
+
+// Article
+
+db.createView(
+    "v_article_libcomplet",   
+    "article",            
+    [
+        {
+            $lookup: {
+            from: "category_article",           
+            localField: "category_article_id",   
+            foreignField: "_id",     
+            as: "category_article"
+            }
+        },
+        { $unwind: "$category_article" },   
+        {
+            $project: {
+            category_article_id : 0 
+            }
+        }
+    ]
+)
+  
+
