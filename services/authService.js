@@ -33,7 +33,7 @@ const AuthService = {
                 expiration_Date
             });
     
-            await tokenUser.save();
+            token = await tokenUser.save();
         }
 
         return token.valeur;
